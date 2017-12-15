@@ -16,17 +16,15 @@ class App extends Component {
 	}
 	
 	componentWillMount(){
-		setInterval(() => {
-			const _MessagesAll = firebase.database().ref('chatMessages/');
-			_MessagesAll.on("value", (snapshot) => {
-				var _val = Object.values(snapshot.val()),
-					_all = [];
-				_val.map((e)=>{
-					_all.push(e);
-				});
-				this.setState({message : this.state.messages.concat(_all)});
+		//setInterval(() => {
+			this.setState({ messages: [] });
+			const _MessagesAll = firebase.database().ref('chatMessages/').orderByKey();
+			_MessagesAll.on("child_added", (snapshot) => {
+				let _all = {user : snapshot.val().user, time : snapshot.val().time, message : snapshot.val().message}
+				this.setState({ messages: [...this.state.messages, _all] });
 			});	
-		},2000)
+
+		//},2000)
 	}
 	
 	updateUser(User){
@@ -46,6 +44,7 @@ class App extends Component {
 		
 	}
 	render(){
+
 		let _comp;
 		if(this.state.user !== ""){
 			_comp = <Chat updateMess={this.updateMessage} messages={this.state.messages} user={this.state.user} />;
