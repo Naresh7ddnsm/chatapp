@@ -22,15 +22,14 @@ export class Chat extends React.Component {
 		this.setState({lastMessage : ""});
 	}
 	render(){
-		console.log(this.props.messages);
 		return(
 			<div>
 				<h2>Chat Comp</h2>
 				<p>Welcome {this.props.user}</p>
 				{
-					// this.props.messages.map((message, i) => {
-						// return <Message key={i} user ={this.props.user} mess={message}/>
-					// })
+					this.props.messages.map((message, i) => {
+						 return <Message key={i} user ={this.props.user} mess={message}/>
+					})
 				}
 				<form onSubmit={this.postMessage}>
 					<input id='message' type='text' name="message" placeholder='Enter message' onChange={this.updateMessage} value={this.state.lastMessage} ref="message"/>
