@@ -2,60 +2,47 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import firebase from './db';
 import { Chat } from "./chat";
-import { User } from "./User";
+import { User } from "./user";
+import { Authen } from "./Auth";
 
 class App extends Component {
 	constructor(props){
 		super()
 		this.state = {
 			messages : [],
-			user : ""
+			user : null
 		}
 		this.updateUser = this.updateUser.bind(this);
 		this.updateMessage = this.updateMessage.bind(this);
+		this._Messages = firebase.database().ref('chatMessages');
 	}
 	
 	componentWillMount(){
-		setInterval(() => {
-			const _MessagesAll = firebase.database().ref('chatMessages/');
-			_MessagesAll.on("value", (snapshot) => {
-				var _val = Object.values(snapshot.val()),
-					_all = [];
-				_val.map((e)=>{
-					_all.push(e);
-				});
-				this.setState({message : this.state.messages.concat(_all)});
-			});	
-		},2000)
+		this.setState({ messages: [] });
+		 const _MessagesAll = this._Messages.orderByKey();
+		_MessagesAll.on("child_added", (snapshot) => {
+			this.setState({ messages: [...this.state.messages, snapshot.val()] });
+		});
 	}
-	
 	updateUser(User){
 		this.setState({
 			user : User 
 		})
 	}
 	updateMessage(mess){
-		const _Messages = firebase.database().ref('chatMessages'),
-			Messages = this.state.messages,
+		const Messages = this.state.messages,
 			_message = {
-				user : this.state.user,
+				user : this.state.user.email,
 				message : mess,
 				time : new Date().getTime()
 			};
-		_Messages.push(_message);
-		
+		this._Messages.push(_message);
 	}
 	render(){
-		let _comp;
-		if(this.state.user !== ""){
-			_comp = <Chat updateMess={this.updateMessage} messages={this.state.messages} user={this.state.user} />;
-		} else {
-			_comp = <User update={this.updateUser}/>
-		}
 		return(
 			<div>
 				<h1>Welcome to Char Box 01</h1>
-				{ _comp }
+				{ this.state.user ? <Chat user={this.state.user} updateMess = {this.updateMessage} messages={this.state.messages}/> :  <Authen sendUser = {this.updateUser}/> }
 			</div>
 		);
 	}
