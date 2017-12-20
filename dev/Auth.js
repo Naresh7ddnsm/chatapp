@@ -40,10 +40,11 @@ export class Authen extends React.Component {
 		promise
 		.then(user => {
 			let err = "Welcome " + user.email;
-			const users = firebase.database().ref('users/'+user.uid);
+			const users = firebase.database().ref('users/');
 			const _user = {
 				email : user.email,
-				timestamp : new Date().getTime()
+				timestamp : new Date().getTime(),
+				uid : user.uid
 			};
 			users.push(_user);
 			this.setState({
@@ -72,12 +73,12 @@ export class Authen extends React.Component {
 
 	}
 	google(){
-		console.log('in google provider')
+		//console.log('in google provider')
 		let provider = new firebase.auth.GoogleAuthProvider();
 		const promise = firebase.auth().signInWithPopup(provider);
 
 		promise.then(result => {
-			console.log(result);
+			//console.log(result);
 			let user = result.user;
 			firebase.database().ref('users/'+user.uid).set({
 				email : user.email,

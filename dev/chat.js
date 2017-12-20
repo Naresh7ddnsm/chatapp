@@ -1,6 +1,7 @@
 import React from "react";
 import { Message } from "./message";
 import firebase from './db';
+import Users from './users';
 
 
 export class Chat extends React.Component {
@@ -22,7 +23,7 @@ export class Chat extends React.Component {
 		this.setState({lastMessage : ""});
 	}
 	render(){
-		console.log(this.props.user);
+		//console.log(this.props.user);
 		return(
 			<div>
 				<h2>Chat Comp</h2>
@@ -36,6 +37,9 @@ export class Chat extends React.Component {
 					<input id='message' type='text' name="message" placeholder='Enter message' onChange={this.updateMessage} value={this.state.lastMessage} ref="message"/>
 					<button name='submit' type='submit'>Leave a message</button>
 				</form>
+
+				<Users users={this.props.users}/>
+
 			</div>
 		);
 	}
