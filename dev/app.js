@@ -10,19 +10,28 @@ class App extends Component {
 		super()
 		this.state = {
 			messages : [],
-			user : null
+			user : null,
+			users : []
 		}
 		this.updateUser = this.updateUser.bind(this);
 		this.updateMessage = this.updateMessage.bind(this);
+		this.ref = firebase.database().ref();
 		this._Messages = firebase.database().ref('chatMessages');
 	}
 	
 	componentWillMount(){
-		this.setState({ messages: [] });
+		this.setState({ messages: [], users: [] });
 		 const _MessagesAll = this._Messages.orderByKey();
 		_MessagesAll.on("child_added", (snapshot) => {
 			this.setState({ messages: [...this.state.messages, snapshot.val()] });
 		});
+		const _Users = this.ref.child('users/').orderByKey();
+		_Users.on('child_added', snapshot => {
+			this.setState({ users: [...this.state.users, snapshot.val()] });
+		})
+	}
+	componentDidMount(){
+		//console.log(this.state.users);
 	}
 	updateUser(User){
 		this.setState({
@@ -42,7 +51,7 @@ class App extends Component {
 		return(
 			<div>
 				<h1>Welcome to Char Box 01</h1>
-				{ this.state.user ? <Chat user={this.state.user} updateMess = {this.updateMessage} messages={this.state.messages}/> :  <Authen sendUser = {this.updateUser}/> }
+				{ this.state.user ? <Chat user={this.state.user} users={this.state.users} updateMess={this.updateMessage} messages={this.state.messages}/> :  <Authen sendUser = {this.updateUser}/> }
 			</div>
 		);
 	}
